@@ -532,7 +532,7 @@ static void function(FunctionType type) {
     block();
 
     ObjFunction* function = endCompiler();
-    emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
+    emitBytes(OP_CLOSURE, makeConstant(OBJ_VAL(function)));
 }
 
 static void funDeclaration() {
@@ -635,7 +635,7 @@ static void returnStatement() {
     if (current->type == TYPE_SCRIPT) {
         error("Can't return from top-level code.");
     }
-    
+
     if (match(TOKEN_SEMICOLON)) {
         emitReturn();
     } else {
