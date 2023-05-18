@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "debug.h": "c",
+        "*.tcc": "c",
+        "algorithm": "c",
+        "limits": "c",
+        "type_traits": "c",
+        "functional": "c",
+        "streambuf": "c"
+    }
+}
