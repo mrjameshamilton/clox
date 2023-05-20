@@ -652,8 +652,8 @@ static void classDeclaration() {
     emitBytes(OP_CLASS, nameConstant);
     defineVariable(nameConstant);
 
-    ClassCompiler* classCompiler;
-    classCompiler->enclosing = currentClass;
+    ClassCompiler classCompiler;
+    classCompiler.enclosing = currentClass;
     currentClass = &classCompiler;
 
     namedVariable(className, false);
