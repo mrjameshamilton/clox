@@ -66,9 +66,10 @@ ObjInstance* newInstance(ObjClass* klass) {
     return instance;
 }
 
-ObjNative* newNative(NativeFn function) {
+ObjNative* newNative(NativeFn function, int argCount) {
     ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
     native->function = function;
+    native->argCount = argCount;
     return native;
 }
 

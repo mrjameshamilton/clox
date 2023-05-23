@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 #include "common.h"
 #include "vm.h"
 #include "debug.h"
@@ -13,8 +14,24 @@
 
 VM vm;
 
-static Value clockNative(int argCount, Value* args) {
-    return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+static void runtimeError(const char* format, ...);
+
+static bool clockNative(int argCount, Value* args, Value* result) {
+    *result = NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+    return true;
+}
+
+static bool exitNative(int argCount, Value* args, Value* result) {
+    if (!IS_NUMBER(args[0])) {
+        runtimeError("Number expected for exit() parameter.");
+        return false;
+    }
+
+    exit(AS_NUMBER(args[0]));
+
+    *result = NIL_VAL;
+
+    return true;
 }
 
 static void resetStack() {
@@ -44,9 +61,9 @@ static void runtimeError(const char* format, ...) {
     resetStack();
 }
 
-static void defineNative(const char* name, NativeFn function) {
+static void defineNative(const char* name, NativeFn function, int argCount) {
     push(OBJ_VAL(copyString(name, (int)strlen(name))));
-    push(OBJ_VAL(newNative(function)));
+    push(OBJ_VAL(newNative(function, argCount)));
     tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
     pop();
     pop();
@@ -66,7 +83,8 @@ void initVM() {
     vm.initString = NULL;
     vm.initString = copyString("init", 4);
 
-    defineNative("clock", clockNative);
+    defineNative("clock", clockNative, 0);
+    defineNative("exit", exitNative, 1);
 }
 
 void freeVM() {
@@ -133,8 +151,15 @@ static bool callValue(Value callee, int argCount) {
                 return call(AS_CLOSURE(callee), argCount);
             }
             case OBJ_NATIVE: {
-                NativeFn native = AS_NATIVE(callee);
-                Value result = native(argCount, vm.stackTop - argCount);
+                ObjNative* native = AS_NATIVE(callee);
+                if (native->argCount != argCount) {
+                    runtimeError("Expected %d arguments but got %d.", native->argCount, argCount);
+                    return false;
+                }
+                Value result;
+                if (!(native->function(argCount, vm.stackTop - argCount, &result))) {
+                    return false;
+                }
                 vm.stackTop -= argCount + 1;
                 push(result);
                 return true;
