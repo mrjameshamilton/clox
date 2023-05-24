@@ -27,22 +27,22 @@ void freeValueArray(ValueArray* array) {
     initValueArray(array);
 }
 
-void printValue(Value value) {
+void printValue(FILE* file, Value value) {
 #ifdef NAN_BOXING
     if (IS_BOOL(value)) {
-        printf(AS_BOOL(value) ? "true" : "false");
+        fprintf(file, AS_BOOL(value) ? "true" : "false");
     } else if (IS_NIL(value)) {
-        printf("nil");
+        fprintf(file, "nil");
     } else if (IS_NUMBER(value)) {
-        printf("%g", AS_NUMBER(value));
+        fprintf(file, "%g", AS_NUMBER(value));
     } else if (IS_OBJ(value)) {
-        printObject(value);
+        printObject(file, value);
     }
 #else
     switch (value.type) {
-        case VAL_BOOL: printf(AS_BOOL(value) ? "true" : "false"); break;
-        case VAL_NIL: printf("nil"); break;
-        case VAL_NUMBER: printf("%g", AS_NUMBER(value)); break;
+        case VAL_BOOL: fprintf(file, AS_BOOL(value) ? "true" : "false"); break;
+        case VAL_NIL: fprintf(file, "nil"); break;
+        case VAL_NUMBER: fprintf(file, "%g", AS_NUMBER(value)); break;
         case VAL_OBJ: printObject(value); break;
     }
 #endif

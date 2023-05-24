@@ -34,6 +34,47 @@ static bool exitNative(int argCount, Value* args, Value* result) {
     return true;
 }
 
+static bool readNative(int argCount, Value* args, Value* result) {
+    int c = getchar();
+    *result = c == -1 ? NIL_VAL : NUMBER_VAL(c);
+    return true;
+}
+
+static bool printerrNative(int argCount, Value* args, Value* result) {
+    printValue(stderr, args[0]);
+    fprintf(stderr, "\n");
+    *result = NIL_VAL;
+    return true;
+}
+
+static bool utfNative(int argCount, Value* args, Value* result) {
+
+    for (int i = 0; i < 4; i++) {
+        if (i > 0 && IS_NIL(args[i])) continue;
+        
+        if (!IS_NUMBER(args[i]) || (AS_NUMBER(args[i]) < 0 || AS_NUMBER(args[i]) > 255)) {
+            runtimeError("utf parameter should be a number between 0 and 255.");
+            return false;
+        }        
+    }
+
+    int count = 0;
+    unsigned char bytes[] = { 
+        IS_NIL(args[0]) ? 0 : AS_NUMBER(args[count++]),
+        IS_NIL(args[1]) ? 0 : AS_NUMBER(args[count++]),
+        IS_NIL(args[2]) ? 0 : AS_NUMBER(args[count++]),
+        IS_NIL(args[3]) ? 0 : AS_NUMBER(args[count++]),
+    };
+
+    char chars[count];
+    memcpy(chars, bytes, count);
+    chars[count] = '\0';
+
+    *result = OBJ_VAL(copyString((char*)chars, argCount));
+
+    return true;
+}
+
 static void resetStack() {
     vm.stackTop = vm.stack;
     vm.frameCount = 0;
@@ -85,6 +126,9 @@ void initVM() {
 
     defineNative("clock", clockNative, 0);
     defineNative("exit", exitNative, 1);
+    defineNative("read", readNative, 0);
+    defineNative("printerr", printerrNative, 1);
+    defineNative("utf", utfNative, 4);
 }
 
 void freeVM() {
@@ -295,7 +339,7 @@ static InterpretResult run() {
     printf("         ");
     for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
         printf("[ ");
-        printValue(*slot);
+        printValue(stdout, *slot);
         printf(" ]");
     }
     printf("\n");
@@ -433,7 +477,7 @@ static InterpretResult run() {
                 *(vm.stackTop - 1) = NUMBER_VAL(-AS_NUMBER(*(vm.stackTop - 1)));
                 break;
             case OP_PRINT: {
-                printValue(pop());
+                printValue(stdout, pop());
                 printf("\n");
                 break;
             }

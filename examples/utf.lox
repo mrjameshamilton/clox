@@ -1,0 +1,4 @@
+print utf(65, nil, nil, nil);
+print utf(198, 178, nil, nil);
+print utf(198, 178, 134, nil);
+print utf(198, 178, 134, 123);

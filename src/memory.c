@@ -37,7 +37,7 @@ void markObject(Obj* object) {
 
 #ifdef DEBUG_LOG_GC
     printf("%p mark ", (void*)object);
-    printValue(OBJ_VAL(object));
+    printValue(stdout, OBJ_VAL(object));
     printf("\n");
 #endif
     object->isMarked = true;
@@ -65,7 +65,7 @@ static void markArray(ValueArray* array) {
 static void blackenObject(Obj* object) {
 #ifdef DEBUG_LOG_GC
     printf("%p blacken ", (void*)object);
-    printValue(OBJ_VAL(object));
+    printValue(stdout, OBJ_VAL(object));
     printf("\n");
 #endif
     switch (object->type) {

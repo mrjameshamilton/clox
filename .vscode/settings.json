@@ -6,6 +6,10 @@
         "limits": "c",
         "type_traits": "c",
         "functional": "c",
-        "streambuf": "c"
+        "streambuf": "c",
+        "system_error": "c",
+        "array": "c",
+        "tuple": "c",
+        "utility": "c"
     }
 }

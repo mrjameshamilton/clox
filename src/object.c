@@ -125,40 +125,40 @@ ObjUpvalue* newUpvalue(Value* slot) {
     return upvalue;
 }
 
-static void printFunction(ObjFunction* function) {
+static void printFunction(FILE* file, ObjFunction* function) {
     if (function->name == NULL) {
-        printf("<script>");
+        fprintf(file, "<script>");
         return;
     }
 
     printf("<fn %s>", function->name->chars);
 }
 
-void printObject(Value value) {
+void printObject(FILE* file, Value value) {
     switch (OBJ_TYPE(value)) {
         case OBJ_BOUND_METHOD:
-            printFunction(AS_BOUND_METHOD(value)->method->function);
+            printFunction(file, AS_BOUND_METHOD(value)->method->function);
             break;
         case OBJ_CLASS:
-            printf("%s", AS_CLASS(value)->name->chars);
+            fprintf(file, "%s", AS_CLASS(value)->name->chars);
             break;
         case OBJ_CLOSURE:
-            printFunction(AS_CLOSURE(value)->function);
+            printFunction(file, AS_CLOSURE(value)->function);
             break;
         case OBJ_FUNCTION:
-            printFunction(AS_FUNCTION(value));
+            printFunction(file, AS_FUNCTION(value));
             break;
         case OBJ_INSTANCE:
-            printf("%s instance", AS_INSTANCE(value)->klass->name->chars);
+            fprintf(file, "%s instance", AS_INSTANCE(value)->klass->name->chars);
             break;
         case OBJ_NATIVE:
-            printf("<native fn>");
+            fprintf(file, "<native fn>");
             break;
         case OBJ_STRING:
-            printf("%s", AS_CSTRING(value));
+            fprintf(file, "%s", AS_CSTRING(value));
             break;
         case OBJ_UPVALUE:
-            printf("upvalue");
+            fprintf(file, "upvalue");
             break;
     }
 }
