@@ -36,7 +36,7 @@ static bool exitNative(int argCount, Value* args, Value* result) {
 
 static bool readNative(int argCount, Value* args, Value* result) {
     int c = getchar();
-    *result = c == -1 ? NIL_VAL : NUMBER_VAL(c);
+    *result = c == -1 ? NIL_VAL : NUMBER_VAL((uint8_t) c);
     return true;
 }
 
@@ -68,9 +68,8 @@ static bool utfNative(int argCount, Value* args, Value* result) {
 
     char chars[count];
     memcpy(chars, bytes, count);
-    chars[count] = '\0';
-
-    *result = OBJ_VAL(copyString((char*)chars, argCount));
+    // No need to null terminate here, copyString will do it.
+    *result = OBJ_VAL(copyString((char*)chars, count));
 
     return true;
 }
