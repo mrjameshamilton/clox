@@ -41,7 +41,7 @@ static int invokeInstruction(const char* name, Chunk* chunk, int offset) {
     uint8_t argCount = chunk->code[offset + 2];
     printf("%-16s (%d args) %d '", name, argCount, constant);
     printValue(stdout, chunk->constants.values[constant]);
-    printf("'\n'");
+    printf("'\n");
     return offset + 3;
 }
 
