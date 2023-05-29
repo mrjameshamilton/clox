@@ -43,7 +43,7 @@ void printValue(FILE* file, Value value) {
         case VAL_BOOL: fprintf(file, AS_BOOL(value) ? "true" : "false"); break;
         case VAL_NIL: fprintf(file, "nil"); break;
         case VAL_NUMBER: fprintf(file, "%g", AS_NUMBER(value)); break;
-        case VAL_OBJ: printObject(value); break;
+        case VAL_OBJ: printObject(file, value); break;
     }
 #endif
 }
