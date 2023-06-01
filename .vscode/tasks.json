@@ -10,7 +10,8 @@
                 "src/*.c",
                 "-o",
                 "${workspaceRoot}/clox",
-                "-Wincompatible-pointer-types"
+                "-Wincompatible-pointer-types",
+                "-O3"
             ],
             "problemMatcher": [
                 "$gcc"
