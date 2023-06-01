@@ -347,20 +347,17 @@ static InterpretResult run() {
 #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
-            case OP_CONSTANT: {
-                Value constant = READ_CONSTANT();
-                push(constant);
-                break;
-            }
-            case OP_CONSTANT_16: {
-                Value constant = READ_CONSTANT_16();
-                push(constant);
-                break;
-            }
-            case OP_NIL:   push(NIL_VAL);            break;
-            case OP_TRUE:  push(BOOL_VAL(true));     break;
-            case OP_FALSE: push(BOOL_VAL(false));    break;
-            case OP_POP: pop(); break;
+            case OP_CONSTANT:    push(READ_CONSTANT());    break;
+            case OP_CONSTANT_16: push(READ_CONSTANT_16()); break;
+            case OP_INTEGER:    push(NUMBER_VAL(READ_BYTE()));  break;
+            case OP_INTEGER_16: push(NUMBER_VAL(READ_SHORT())); break;
+            case OP_NIL:        push(NIL_VAL);                  break;
+            case OP_TRUE:       push(BOOL_VAL(true));           break;
+            case OP_FALSE:      push(BOOL_VAL(false));          break;
+            case OP_MINUS_ONE:  push(NUMBER_VAL(-1));           break;
+            case OP_ZERO:       push(NUMBER_VAL(0));            break;
+            case OP_ONE:        push(NUMBER_VAL(1));            break;
+            case OP_POP:        pop(); break;
             case OP_GET_LOCAL: {
                 uint8_t slot = READ_BYTE();
                 push(frame->slots[slot]);

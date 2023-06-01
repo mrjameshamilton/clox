@@ -158,14 +158,12 @@ static void emitLoop(int loopStart) {
     int offset = currentChunk()->count - loopStart + 2;
     if (offset > UINT16_MAX) error("Loop body too large.");
 
-    emitByte((offset >> 8) & 0xff);
-    emitByte(offset & 0xff);
+    emitShort(offset);
 }
 
 static int emitJump(uint8_t instruction) {
     emitByte(instruction);
-    emitByte(0xff);
-    emitByte(0xff);
+    emitShort(0xffff);
     return currentChunk()->count - 2;
 }
 
@@ -195,10 +193,10 @@ static uint16_t identifierConstant(Token* name) {
 static void emitConstant(Value value) {
     uint16_t constant = makeConstant(value);
     
-    if (constant < UINT8_MAX) {
+    if (constant <= UINT8_MAX) {
         emitByte(OP_CONSTANT);
         emitByte((uint8_t)constant);
-    } else if (constant < UINT16_MAX) {
+    } else if (constant <= UINT16_MAX) {
         emitByte(OP_CONSTANT_16);
         emitShort(constant);
     }
