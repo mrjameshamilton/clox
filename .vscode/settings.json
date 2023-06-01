@@ -11,6 +11,13 @@
         "array": "c",
         "tuple": "c",
         "utility": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "bit": "c",
+        "exception": "c",
+        "cmath": "c",
+        "random": "c",
+        "numeric": "c",
+        "ostream": "c",
+        "typeinfo": "c"
     }
 }

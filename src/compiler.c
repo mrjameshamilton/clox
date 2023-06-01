@@ -194,8 +194,14 @@ static uint16_t identifierConstant(Token* name) {
 
 static void emitConstant(Value value) {
     uint16_t constant = makeConstant(value);
-    emitByte(OP_CONSTANT);
-    emitShort(constant);
+    
+    if (constant < UINT8_MAX) {
+        emitByte(OP_CONSTANT);
+        emitByte((uint8_t)constant);
+    } else if (constant < UINT16_MAX) {
+        emitByte(OP_CONSTANT_16);
+        emitShort(constant);
+    }
 }
 
 static void patchJump(int offset) {

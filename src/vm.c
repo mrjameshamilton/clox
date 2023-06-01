@@ -318,10 +318,11 @@ static InterpretResult run() {
     CallFrame* frame = &vm.frames[vm.frameCount - 1];
 
 #define READ_BYTE() (*frame->ip++)
-#define READ_CONSTANT() (frame->closure->function->chunk.constants.values[(uint16_t)READ_SHORT()])
+#define READ_CONSTANT() (frame->closure->function->chunk.constants.values[(uint8_t)READ_BYTE()])
+#define READ_CONSTANT_16() (frame->closure->function->chunk.constants.values[(uint16_t)READ_SHORT()])
 #define READ_SHORT() \
         (frame->ip += 2, (uint16_t)((frame->ip[-2] << 8 | frame->ip[-1])))
-#define READ_STRING() AS_STRING(READ_CONSTANT())
+#define READ_STRING() AS_STRING(READ_CONSTANT_16())
 #define BINARY_OP(valueType, op) \
     do { \
         if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
@@ -348,6 +349,11 @@ static InterpretResult run() {
         switch (instruction = READ_BYTE()) {
             case OP_CONSTANT: {
                 Value constant = READ_CONSTANT();
+                push(constant);
+                break;
+            }
+            case OP_CONSTANT_16: {
+                Value constant = READ_CONSTANT_16();
                 push(constant);
                 break;
             }
@@ -524,7 +530,7 @@ static InterpretResult run() {
                 break;
             }
             case OP_CLOSURE: {
-                ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
+                ObjFunction* function = AS_FUNCTION(READ_CONSTANT_16());
                 ObjClosure* closure = newClosure(function);
                 push(OBJ_VAL(closure));
                 for (int i = 0; i < closure->upvalueCount; i++) {
