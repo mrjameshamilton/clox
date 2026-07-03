@@ -47,6 +47,47 @@ static bool printerrNative(int argCount, Value* args, Value* result) {
     return true;
 }
 
+static bool chrNative(int argCount, Value* args, Value* result) {
+    if (!IS_NUMBER(args[0])) {
+        runtimeError("chr parameter should be a number.");
+        return false;
+    }
+
+    int c = (int)AS_NUMBER(args[0]);
+    if (c < 0 || c > 0x10FFFF) {
+        runtimeError("chr parameter should be a valid Unicode code point.");
+        return false;
+    }
+
+    // Encode the code point as UTF-8.
+    unsigned char bytes[4];
+    int count;
+    if (c < 0x80) {
+        bytes[0] = (unsigned char)c;
+        count = 1;
+    } else if (c < 0x800) {
+        bytes[0] = (unsigned char)(0xC0 | (c >> 6));
+        bytes[1] = (unsigned char)(0x80 | (c & 0x3F));
+        count = 2;
+    } else if (c < 0x10000) {
+        bytes[0] = (unsigned char)(0xE0 | (c >> 12));
+        bytes[1] = (unsigned char)(0x80 | ((c >> 6) & 0x3F));
+        bytes[2] = (unsigned char)(0x80 | (c & 0x3F));
+        count = 3;
+    } else {
+        bytes[0] = (unsigned char)(0xF0 | (c >> 18));
+        bytes[1] = (unsigned char)(0x80 | ((c >> 12) & 0x3F));
+        bytes[2] = (unsigned char)(0x80 | ((c >> 6) & 0x3F));
+        bytes[3] = (unsigned char)(0x80 | (c & 0x3F));
+        count = 4;
+    }
+
+    // No need to null terminate here, copyString will do it.
+    *result = OBJ_VAL(copyString((char*)bytes, count));
+
+    return true;
+}
+
 static bool utfNative(int argCount, Value* args, Value* result) {
 
     for (int i = 0; i < 4; i++) {
@@ -127,6 +168,7 @@ void initVM() {
     defineNative("exit", exitNative, 1);
     defineNative("read", readNative, 0);
     defineNative("printerr", printerrNative, 1);
+    defineNative("chr", chrNative, 1);
     defineNative("utf", utfNative, 4);
 }
 
